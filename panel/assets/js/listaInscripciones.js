@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const menuPrincipalBtn = document.getElementById("menuPrincipal"); //Boton para volver al menu principal
 
-    menuPrincipalBtn.addEventListener("click", function() {
+    menuPrincipalBtn.addEventListener("click", function() { //Funcion enlace a menu principal
         window.location.href = "index.php";
     });
 
@@ -15,7 +15,8 @@ document.addEventListener("DOMContentLoaded", function() {
         formData.append('idPrueba', idPrueba);
         formData.append('idClase', idClase);
 
-        //Vamos a hacer una consulta que nos muestre los alumnos de una clase inscritos en una prueba concreta (es el option por defecto)
+        //Esta funcion nos busca al inicio el alumno inscrito a una prueba segun una clase 
+        //(es el option por defecto. Si hay un alumno inscrito saldrá su nombre y si no, un mensaje que no hay alumno)
         async function buscarInscritos() {
             try {
                 const response = await fetch(`index.php?controlador=Inscripciones&accion=cBuscarInscritos`, {
@@ -46,66 +47,63 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.error('Error:', error);
             }
         }
+        //Llamamos a la funcion para que me busque los inscritos de la clase
+        buscarInscritos();
+    })
+       
+    //Creamos un array donde vamos a guardar los valores de select
+    const selectMarcados = [];
 
-        // Al hacer clic en el select, cargamos los alumnos si no se han cargado previamente
+    //Creamos una función que utilizaremos para actualizar los valores de los select cada vez que cambiemos el valor de alguno de ellos
+    function actualizarAlumnos(){
+        selectMarcados.length = 0; //Cuando actualicemos, vaciamos el array
+        selectElements.forEach(select =>{
+            selectMarcados.push(select.value); //Una vez vaciado el array, iremos añadiendo los valores de los select uno por uno
+        });
+        console.log(selectMarcados);
+    }
+
+    //Agregar un eventListener a todos los select para que se actualice el array al haber un cambio de valor
+    selectElements.forEach(select =>{
+        select.addEventListener('change', actualizarAlumnos);
+    })
+
+    //Al iniciar la página siempre cargaremos el array en primer lugar
+    actualizarAlumnos();
+
+    // Al hacer clic en el select, cargamos los alumnos si no se han cargado previamente
+    selectElements.forEach(select =>{
+
         select.addEventListener('click', async function() {
-            if (!alumnosCargados) {
-                // Si no se han cargado alumnos, se hace la búsqueda
-                await buscarInscritos();
-                
-                // Ahora cargamos la lista de alumnos
-                const formDataAlumnos = new FormData();
-                formDataAlumnos.append('idClase', idClase);
+            
+            const formDataAlumnos = new FormData();
+            formDataAlumnos.append('idClase', idClase);
 
-                try {
-                    const responseAlumnos = await fetch('index.php?controlador=Inscripciones&accion=cListaClase', {
-                        method: 'POST',
-                        body: formDataAlumnos,
-                    });
+            try {
+                const responseAlumnos = await fetch('index.php?controlador=Inscripciones&accion=cListaClase', {
+                    method: 'POST',
+                    body: formDataAlumnos,
+                });
 
-                    if (responseAlumnos.ok) {
-                        const resultAlumnos = await responseAlumnos.json();
+                if (responseAlumnos.ok) {
+                    const resultAlumnos = await responseAlumnos.json();
 
-                        // Limpiar las opciones previas (excepto el mensaje "No hay alumnos" si se mostró)
-                        select.innerHTML = '';
-                        if (resultAlumnos && resultAlumnos.length > 0) {
-                            // Si hay alumnos, agregar las opciones correspondientes
-                            resultAlumnos.forEach(alumno => {
-                                // Verificamos si esta opción ya está seleccionada en otro select
-                                if (!opcionesSeleccionadas[alumno.idAlumno]) {
-                                    const option = document.createElement('option');
-                                    option.value = alumno.idAlumno;  // El valor será el ID
-                                    option.textContent = alumno.nombre;  // El texto será el nombre
-                                    select.appendChild(option);
-                                }
-                            });
-                        } else {
-                            // Si no hay alumnos, agregar un mensaje
+                    resultAlumnos.forEach(alumno =>{
+                        const nombreAlumno = alumno.nombre;
+
+                        if(!selectMarcados.includes(nombreAlumno)){
                             const option = document.createElement('option');
-                            option.textContent = 'No se encontraron alumnos';
+                            option.value = alumno.idAlumno;  // El valor será el ID
+                            option.textContent = alumno.nombre;  // El texto será el nombre
                             select.appendChild(option);
                         }
-                    }
-
-                } catch (error) {
-                    console.error('Error al cargar los alumnos:', error);
+                    });              
                 }
 
-                // Marcar como cargado para evitar múltiples búsquedas
-                alumnosCargados = true;
+            } catch (error) {
+                console.error('Error al cargar los alumnos:', error);
             }
         });
-
-        // Al seleccionar una opción en el select
-        select.addEventListener('change', function(event) {
-            const selectedOption = event.target.value;
-            if (selectedOption) {
-                // Guardamos la opción seleccionada para que no se repita en los otros selects
-                opcionesSeleccionadas[selectedOption] = true;
-            }
-        });
-
-        // Llamada inicial para cargar la información (si es necesario)
-        buscarInscritos(); 
     });
 });
+
