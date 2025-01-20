@@ -8,8 +8,8 @@ class mInscripciones{
     public function __construct(){}
 
     public function conectar(){
-        $objetoBD = new bbdd(); //Conectamos a la base de datos. Creamos objeto $objetoBD
-        $this->conexion = $objetoBD->conexion; //Llamamos al metodo que realiza la conexion a la BBDD
+        $objetoBD = new bbdd(); 
+        $this->conexion = $objetoBD->conexion; 
     }
 
     public function mListaInscripciones(){
@@ -28,9 +28,7 @@ class mInscripciones{
         if ($sentencia === false) {
             die('Error en la preparación de la consulta: ' . $this->conexion->error);
         }
-
         $sentencia->bind_param('iss', $idAlumno, $nombre, $idClase);
-    
         $resultado = $sentencia->execute();
     
         if ($resultado) {
@@ -47,42 +45,31 @@ class mInscripciones{
             INNER JOIN inscripciones ON alumnos.idAlumno = inscripciones.idAlumno 
             WHERE inscripciones.idPrueba = ? AND alumnos.idClase = ?";
         $sentencia = $this->conexion->prepare($sql);
-        $sentencia->bind_param("is", $idPrueba, $idClase); // Asegúrate de que los tipos sean correctos
+        $sentencia->bind_param("is", $idPrueba, $idClase);
         $sentencia->execute();
         $resultado = $sentencia->get_result();
 
         if ($resultado && $resultado->num_rows > 0) {
-            return $resultado->fetch_all(MYSQLI_ASSOC); // Devuelve el array de resultados
+            return $resultado->fetch_all(MYSQLI_ASSOC); 
         }
-        return null; // Si no hay resultados, devuelve null
+        return null; 
     }
 
     public function mListaClase($idClase){
         $this->conectar();
-    // Prepara la consulta para evitar la inyección SQL
     $sql = "SELECT idAlumno, nombre FROM alumnos WHERE idClase = ?";
-    // Prepara la sentencia
     if ($sentencia = $this->conexion->prepare($sql)) {
-        // Vincula el parámetro a la consulta (entero en este caso)
-        $sentencia->bind_param("s", $idClase);  // "i" es para un entero (integer)
-        
-        // Ejecuta la sentencia
+        $sentencia->bind_param("s", $idClase);
         $sentencia->execute();
-        
-        // Obtiene los resultados
         $resultado = $sentencia->get_result();
 
-        // Verifica si hay resultados
         if ($resultado->num_rows > 0) {
-            return $resultado->fetch_all(MYSQLI_ASSOC);  // Devuelve los resultados como un array asociativo
+            return $resultado->fetch_all(MYSQLI_ASSOC); 
         } else {
-            return [];  // Si no hay resultados, devuelve un array vacío
+            return [];
         }
-        
-        // Cierra la sentencia
         $sentencia->close();
     } else {
-        // Si hubo un error al preparar la consulta, lo registramos
         error_log("Error al preparar la consulta: " . $this->conexion->error);
         return false;
     }
@@ -101,9 +88,8 @@ class mInscripciones{
             if (!$sentenciaBorrar->execute()) {
                 throw new Exception("Error al ejecutar el DELETE: " . $sentenciaBorrar->error);
             }
-
+            
             $sentenciaBorrar->close();
-
             $sqlInsert = "INSERT INTO inscripciones (idPrueba, idAlumno) VALUES (?, ?)";
             $sentenciaInsert = $this->conexion->prepare($sqlInsert);
             $sentenciaInsert->bind_param("ii", $idPrueba, $idAlumno);

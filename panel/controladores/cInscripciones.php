@@ -36,7 +36,7 @@ class cInscripciones {
         header('Content-Type: application/json');
         $datos = $this->objInscripciones->mListaClase($idClase);
         if ($datos) {
-            echo json_encode($datos);  // Devuelve los datos como JSON si se encontraron
+            echo json_encode($datos);
         } else {
             echo json_encode(['error' => 'No se encontraron datos']);
         }

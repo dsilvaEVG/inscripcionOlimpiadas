@@ -61,14 +61,15 @@ document.addEventListener("DOMContentLoaded", function() {
     function actualizarAlumnos() {
         selectMarcados.length = 0; // Cuando actualicemos, vaciamos el array
         selectElements.forEach(select => {
-            const opcionMarcada = Array.from(select.options).find(option => option.selected);  //Metemos en un array todos los option del select y buscamos aquel que está seleccionado
+            const opcionMarcada = Array.from(select.options).find(option => option.selected);  
+            //Metemos en un array todos los option del select y buscamos aquel que está seleccionado
 
             // Solo almacenamos el nombre del alumno si no es el mensaje de "No se encontraron alumnos"
-            if (opcionMarcada && opcionMarcada.textContent !== "No se encontraron alumnos") { //Si hay opción seleccionada y no coincide con "No se encontraron alumnos" lo agregamos al array
+            if (opcionMarcada && opcionMarcada.textContent !== "No se encontraron alumnos") { 
+                //Si hay opción seleccionada y no coincide con "No se encontraron alumnos" lo agregamos al array
                 selectMarcados.push(opcionMarcada.textContent); // Almacenamos el nombre
             }
         });
-        console.log(selectMarcados);  // Para ver el contenido del array
     }
 
     //Agregar un eventListener a todos los select para que se actualice el array al haber un cambio de valor
@@ -96,7 +97,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (responseAlumnos.ok) {
                     const resultAlumnos = await responseAlumnos.json(); //Guardo la busqueda en resultAlumnos
 
-                    // Buscamos en cada uno de los options que aparecen en el select. Borramos aquellos que no se encuentran seleccionados y que no digan "No se encontraron alumnos"
+                    // Buscamos en cada uno de los options que aparecen en el select. 
+                    // Borramos aquellos que no se encuentran seleccionados y que no digan "No se encontraron alumnos"
                     Array.from(select.options).forEach(option => {
                         if (!option.selected && option.textContent !== "No se encontraron alumnos") {
                             select.removeChild(option); //Evitamos duplicados de datos
@@ -162,7 +164,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
 
             } catch (error) {
-                alert(error.message); // Mostrar mensaje de error
+                alert(error.message);
             }
         }   
     })     
