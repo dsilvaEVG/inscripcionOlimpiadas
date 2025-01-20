@@ -29,10 +29,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
                     if (result.mensaje) {
                         // Si no hay alumnos, mostramos la opción "No hay alumnos"
+                        select.innerHTML = ''; // Limpiamos todas las opciones
                         const option = document.createElement('option');
-                        option.textContent = result.mensaje;
+                        option.textContent = result.mensaje; // El mensaje "No se encontraron alumnos"
                         option.disabled = true; // No puede ser seleccionada
-                        option.selected = true; // Se selecciona por defecto
                         select.appendChild(option);
                     } else if (result.alumno) {
                         // Si hay un alumno, lo mostramos en un option
@@ -55,12 +55,17 @@ document.addEventListener("DOMContentLoaded", function() {
     const selectMarcados = [];
 
     //Creamos una función que utilizaremos para actualizar los valores de los select cada vez que cambiemos el valor de alguno de ellos
-    function actualizarAlumnos(){
-        selectMarcados.length = 0; //Cuando actualicemos, vaciamos el array
-        selectElements.forEach(select =>{
-            selectMarcados.push(select.value); //Una vez vaciado el array, iremos añadiendo los valores de los select uno por uno
+    function actualizarAlumnos() {
+        selectMarcados.length = 0; // Cuando actualicemos, vaciamos el array
+        selectElements.forEach(select => {
+            const opcionMarcada = Array.from(select.options).find(option => option.selected);  //Metemos en un array todos los option del select y buscamos aquel que está seleccionado
+
+            // Solo almacenamos el nombre del alumno si no es el mensaje de "No se encontraron alumnos"
+            if (opcionMarcada && opcionMarcada.textContent !== "No se encontraron alumnos") { //Si hay opción seleccionada y no coincide con "No se encontraron alumnos" lo agregamos al array
+                selectMarcados.push(opcionMarcada.textContent); // Almacenamos el nombre
+            }
         });
-        console.log(selectMarcados);
+        console.log(selectMarcados);  // Para ver el contenido del array
     }
 
     //Agregar un eventListener a todos los select para que se actualice el array al haber un cambio de valor
@@ -71,11 +76,11 @@ document.addEventListener("DOMContentLoaded", function() {
     //Al iniciar la página siempre cargaremos el array en primer lugar
     actualizarAlumnos();
 
-    // Al hacer clic en el select, cargamos los alumnos si no se han cargado previamente
-    selectElements.forEach(select =>{
+    // Al hacer clic en todos los select, cargamos los alumnos en options nuevos
+    selectElements.forEach(select => {
 
         select.addEventListener('click', async function() {
-            
+            const valorSelect = select.value; // Guardar el valor seleccionado previamente
             const formDataAlumnos = new FormData();
             formDataAlumnos.append('idClase', idClase);
 
@@ -86,18 +91,32 @@ document.addEventListener("DOMContentLoaded", function() {
                 });
 
                 if (responseAlumnos.ok) {
-                    const resultAlumnos = await responseAlumnos.json();
+                    const resultAlumnos = await responseAlumnos.json(); //Guardo la busqueda en resultAlumnos
 
-                    resultAlumnos.forEach(alumno =>{
+                    // Buscamos en cada uno de los options que aparecen en el select. Borramos aquellos que no se encuentran seleccionados y que no digan "No se encontraron alumnos"
+                    Array.from(select.options).forEach(option => {
+                        if (!option.selected && option.textContent !== "No se encontraron alumnos") {
+                            select.removeChild(option); //Evitamos duplicados de datos
+                        }
+                    });
+
+                    // Filtramos y agregamos solo aquellos alumnos no marcados previamente
+                    resultAlumnos.forEach(alumno => {
                         const nombreAlumno = alumno.nombre;
 
-                        if(!selectMarcados.includes(nombreAlumno)){
+                        // Verificar si el alumno ya está marcado en selectMarcados
+                        if (!selectMarcados.includes(nombreAlumno)) {
                             const option = document.createElement('option');
                             option.value = alumno.idAlumno;  // El valor será el ID
                             option.textContent = alumno.nombre;  // El texto será el nombre
                             select.appendChild(option);
                         }
-                    });              
+                    });
+
+                    // Restauramos el valor previamente seleccionado si está presente
+                    if (valorSelect) {
+                        select.value = valorSelect;
+                    }
                 }
 
             } catch (error) {
@@ -106,4 +125,3 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
-
