@@ -1,0 +1,124 @@
+/* Reset de márgenes y padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Fuentes y estilos generales */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* Estilo del encabezado */
+header {
+    display: flex;
+    justify-content: space-between;  /* Distribuye los elementos: uno a la izquierda (h1) y otro a la derecha (botón) */
+    align-items: center;             /* Alinea verticalmente los elementos */
+    padding: 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    font-size: 2rem;
+    margin: 0;
+    flex-grow: 1;  /* Hace que el h1 ocupe todo el espacio disponible */
+    text-align: center; /* Centra el texto del h1 */
+}
+
+#menuPrincipal {
+    background-color: #ff5722;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#menuPrincipal:hover {
+    background-color: #e64a19;
+}
+
+
+#menuPrincipal {
+    background-color: #ff5722;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: auto;  /* Empuja el botón hacia la derecha */
+}
+
+#menuPrincipal:hover {
+    background-color: #e64a19;
+}
+
+/* Estilo principal (contenido de la página) */
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+button {
+    font-size: 1rem;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); /* Enfoque visual */
+}
+
+/* Estilo del pie de página */
+footer {
+    text-align: center;
+    margin-top: 20px;
+    padding: 10px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+footer a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Estilos para pantallas pequeñas (responsive) */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    #menuPrincipal {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+    }
+}
