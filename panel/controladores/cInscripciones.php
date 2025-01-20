@@ -23,9 +23,9 @@ class cInscripciones {
         $idPrueba = $_POST["idPrueba"];
         $idClase = $_POST["idClase"];
         $resultado = $this->objInscripciones->mBuscarInscritos($idPrueba, $idClase);
-
+        header('Content-Type: application/json');
         if ($resultado) {
-            echo json_encode(['alumno' => $resultado[0]]);
+            echo json_encode($resultado);
         } else {
             echo json_encode(['mensaje' => 'No se encontraron alumnos']);
         }
@@ -40,6 +40,14 @@ class cInscripciones {
         } else {
             echo json_encode(['error' => 'No se encontraron datos']);
         }
+    }
+
+    public function cUpdateInscripciones(){
+        $idClase = $_POST["idClase"];
+        $idAlumno = $_POST["idAlumno"];
+        $idPrueba = $_POST["idPrueba"];
+        $resultado = $this->objInscripciones->mUpdateInscripciones($idClase, $idAlumno, $idPrueba);
+        echo $resultado ? "true" : "false";
     }
 
    

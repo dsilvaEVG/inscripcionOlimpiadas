@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     body: formData,  
                 });
 
+    
                 if (response.ok) {
                     const result = await response.json();
 
@@ -34,17 +35,19 @@ document.addEventListener("DOMContentLoaded", function() {
                         option.textContent = result.mensaje; // El mensaje "No se encontraron alumnos"
                         option.disabled = true; // No puede ser seleccionada
                         select.appendChild(option);
-                    } else if (result.alumno) {
-                        // Si hay un alumno, lo mostramos en un option
+                    } else if (result.length > 0){
+                        const alumno = result[0];
                         const option = document.createElement('option');
-                        option.id = result.alumno.idAlumno;
-                        option.textContent = result.alumno.nombre;
+                        option.value = alumno.idAlumno;  // Asignamos el idAlumno como value
+                        option.textContent = alumno.nombre;  // Mostramos el nombre del alumno
                         select.appendChild(option);
                     }
+                } else{
+                    console.error("Error en la respuesta del servidor", response.status);
                 }
 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error al buscar inscritos:', error);
             }
         }
         //Llamamos a la funcion para que me busque los inscritos de la clase
@@ -124,4 +127,43 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     });
-});
+
+    const botonModificar = document.querySelector('button[type="submit"]');
+    botonModificar.addEventListener('click', async function(e) {
+        e.preventDefault();
+
+        for (const select of selectElements){
+            const idPrueba = select.id;
+            const idAlumno = select.value;
+
+            const formData = new FormData();
+            formData.append('idPrueba', idPrueba);
+            formData.append('idClase', idClase);
+            formData.append('idAlumno', idAlumno);
+
+            try {
+                const responseInscripcion = await fetch(`index.php?controlador=Inscripciones&accion=cUpdateInscripciones`, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (responseInscripcion.ok) {
+                    const responseText = await responseInscripcion.text();
+
+                    if (responseText === "true") {
+                        const nuevoParrafo = document.createElement("p");
+                        nuevoParrafo.textContent = "Inserción correcta";
+                        document.body.appendChild(nuevoParrafo);
+                    } else {
+                        alert("Hubo un problema al insertar la prueba.");
+                    }
+                } else {
+                    throw new Error("Hubo un problema con la solicitud.");
+                }
+
+            } catch (error) {
+                alert(error.message); // Mostrar mensaje de error
+            }
+        }   
+    })     
+})
